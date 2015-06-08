@@ -1,0 +1,10 @@
+*.docx
+*.pdf
+eslogin.py
+*.pyc
+doc/
+ref/
+NDA/
+
+
+
