@@ -1,5 +1,6 @@
 *.docx
 *.pdf
+*.tab
 .ipynb_checkpoints
 .gitignore~
 eslogin.py
