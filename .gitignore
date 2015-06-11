@@ -2,6 +2,7 @@
 *.pdf
 *.tab
 *.txt
+*.png
 .ipynb_checkpoints
 .gitignore~
 eslogin.py
