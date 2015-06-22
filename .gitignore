@@ -11,6 +11,8 @@ doc/
 ref/
 NDA/
 data/
+notebook/*.py
+devsetup/
 
 
 
