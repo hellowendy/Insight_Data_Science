@@ -14,7 +14,7 @@ import re
 def main():
     header = 'cr\tname\tad_type'
     print header
-    f = open('/home/wenjun/Documents/2015_Insight_SV/zenit/data/zenit_creatives.txt', 'r')
+    f = open('../data/creatives.txt', 'r')
     for line in f:
         m = re.match('^id: (\d+), name: ([\w_ \#]+), format: .+, ad_type: ([\w_]+), categories:',line)
         if m:

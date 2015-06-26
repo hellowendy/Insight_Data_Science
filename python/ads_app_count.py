@@ -25,7 +25,7 @@ def main():
         for ind in index:
             df.loc[ind,col] = es.count(index="events-2015.05.*", body={'query': {'bool': {'must':[{'match': { 'ai' : col }}, {'match': { 'cr' : ind }}, {'match': { 'et' : 'AD_SHOW' }}],'must_not':[{'match': { 'fr' : 'true' }}]}}})['count']
 
-    df.to_csv("../data/zenit_ad_show_5_2015.tab",sep='\t')
+    df.to_csv("../data/ad_show_5_2015.tab",sep='\t')
 
 if __name__ == '__main__':
     main()
