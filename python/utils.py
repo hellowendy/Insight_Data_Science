@@ -10,10 +10,44 @@ Here stores util functions for data analysis
 """
 
 import math
-from sklearn.metrics.pairwise import cosine_similarity
-#from scipy.spatial.distance import euclidean
-#import numpy as np
+import numpy as np
 import pandas as pd
+
+from sklearn.metrics.pairwise import cosine_similarity
+from scipy.stats import beta
+
+from geopy import geocoders
+import pytz
+
+import settings
+
+
+# Accuracy metrics for predictions
+def error_analysis(predict, reality):
+    accuracy = float(np.sum(predict == reality))/len(reality) * 100
+    precision = float(np.sum((reality == 1)*(reality == predict)))/np.sum(predict == 1) * 100
+    recall = float(np.sum((reality == 1)*(reality == predict)))/np.sum(reality == 1) * 100
+    f1score = 2*precision*recall/(precision + recall)/100
+    print 'accuracy:%.2f\nprecision:%.2f\nrecall:%.2f\nF1 score:%.2f' % (accuracy, precision, recall, f1score)
+
+
+# Convert UTC time to local time given CITY
+def utc_to_local(time, city):
+    try:
+        # get the local time zone
+        g = geocoders.GoogleV3()
+        place, (lat, lng) = g.geocode(city)
+        timezone = g.timezone((lat, lng))
+        tz = pytz.timezone(timezone.zone)
+    
+        # convert UTC to local
+        utc = time.replace(tzinfo=pytz.utc)
+        local = tz.normalize(utc.astimezone(tz))
+    
+        return local
+        
+    except:
+        return np.NaN
 
 
 # Return list of shared item Index of np.Series X and Y
@@ -162,7 +196,7 @@ def cal_scores(df, sm, similarity='cosine'):
     
 
 # Recommend ads for an app based on the weighted average
-def ads_recommendation(df_old, df_new, app):
+def ads_recommendation(df_old, df_new, app, n=5):
     
     #separate indices without record in the old file
     inds = []
@@ -172,3 +206,44 @@ def ads_recommendation(df_old, df_new, app):
     
     #extract the predicted scores
     new = df_new[app][inds]
+    return new.argsort.head(n)
+    
+
+# Compute binomial confidence interval
+def binom_interval(success, total, confint=0.95):
+    quantile = (1 - confint) / 2.
+    mode = float(success)/total
+    lower = beta.ppf(quantile, success, total - success + 1)
+    upper = beta.ppf(1 - quantile, success + 1, total - success)
+    return (mode, lower, upper)
+
+
+# Compute standard interval for binaries
+def binom_error(success, total, confint=0.95):
+    avg = float(success)/total
+    err = np.std([1] * success + [0] * (total - success))/math.sqrt(total)
+    return (avg, err)
+
+
+# Get geo-location for given CITY
+def get_loc(city):
+    try:
+        # get the location
+        g = geocoders.GoogleV3()
+        place, (lat, lng) = g.geocode(city)
+        
+        return (place, lat, lng)
+    except:
+        return np.NaN
+
+
+# Get time zone from LAT and LNG
+def get_time_zone(lat, lng):
+    try:
+        g = geocoders.GoogleV3(settings.google_api_key)
+        timezone = g.timezone((lat, lng))
+    
+        return timezone
+        
+    except:
+        return np.NaN
